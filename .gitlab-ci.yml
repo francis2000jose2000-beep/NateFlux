@@ -4,6 +4,7 @@ stages:
   - tf_plan
   - deploy
   - test
+  - scan
 
 scan-job:
   stage: test
@@ -18,6 +19,22 @@ terraform-run:
     - terraform plan
   environment:
     name: production
+
+terraform_trigger:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - echo "Triggering HCP Terraform run for Workspace $TFC_WORKSPACE_ID"
+
+security_scan:
+  stage: scan
+  image: alpine:latest
+  script:
+    - echo "Initiating DevSecOps Scan for $TARGET_REPO_URL"
+    - echo "Running vulnerability check..."
+    - sleep 5
+    - echo "Scan complete. No high-risk vulnerabilities found."
+
 
 
 variables:

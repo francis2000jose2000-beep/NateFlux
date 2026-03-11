@@ -1,0 +1,16 @@
+{
+  "test": {
+    "pass": {
+      "description": "Allows deployment of the Always Free A1.Flex shape",
+      "mock": {
+        "tfplan/v2": "pass.json"
+      }
+    },
+    "fail": {
+      "description": "Blocks deployment of paid shapes like VM.Standard2.1",
+      "mock": {
+        "tfplan/v2": "fail.json"
+      }
+    }
+  }
+}

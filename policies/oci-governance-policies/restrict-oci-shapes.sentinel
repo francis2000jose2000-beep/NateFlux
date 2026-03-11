@@ -1,0 +1,61 @@
+import "tfplan/v2" as tfplan
+
+# Function to filter resources by type
+find_resources = func(type) {
+  return filter tfplan.resource_changes as address, rc {
+    rc.type is type and
+    (rc.change.actions contains "create" or rc.change.actions contains "update")
+  }
+}
+
+# Define allowed constraints
+allowed_shape = "VM.Standard.A1.Flex"
+max_memory_gbs = 24.0
+
+# Get resources
+oci_instances = find_resources("oci_core_instance")
+oci_container_instances = find_resources("oci_container_instances_container_instance")
+
+# Validation logic
+validate_instance = func(address, r) {
+    shape = r.change.after.shape else ""
+    
+    # Handle shape config for memory. It's usually a list of objects.
+    # We check if shape_config is present and has elements.
+    shape_config = r.change.after.shape_config else []
+    memory = 0.0
+    if length(shape_config) > 0 {
+        memory = float(shape_config[0].memory_in_gbs)
+    }
+
+    if shape != allowed_shape {
+        print("Violation in " + address + ": Shape " + shape + " is not allowed. Must be " + allowed_shape)
+        return false
+    }
+    if memory > max_memory_gbs {
+        print("Violation in " + address + ": Memory " + string(memory) + " GB exceeds the limit of " + string(max_memory_gbs) + " GB.")
+        return false
+    }
+    return true
+}
+
+# Rule to check OCI Core Instances
+instances_validated = rule {
+  all oci_instances as address, r {
+    validate_instance(address, r)
+  }
+}
+
+# Rule to check OCI Container Instances
+container_instances_validated = rule {
+  all oci_container_instances as address, r {
+    validate_instance(address, r)
+  }
+}
+
+# Main rule
+main = rule {
+  instances_validated and container_instances_validated
+} else {
+    print("Non-Free Tier shape detected. Deployment blocked for cost control.")
+}

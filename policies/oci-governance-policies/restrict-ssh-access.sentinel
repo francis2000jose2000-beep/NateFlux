@@ -1,0 +1,66 @@
+import "tfplan/v2" as tfplan
+
+# Get all managed resources from the plan
+all_resources = filter tfplan.resource_changes as address, rc {
+  rc.mode is "managed" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+# Get Security Lists
+security_lists = filter all_resources as address, rc {
+  rc.type is "oci_core_security_list"
+}
+
+# Helper function to check if a security rule allows SSH from anywhere
+is_ssh_open_to_world = func(rule) {
+  # Check if source is 0.0.0.0/0
+  if rule.source != "0.0.0.0/0" {
+    return false
+  }
+  
+  # Check if protocol is TCP (6)
+  if rule.protocol != "6" {
+    return false
+  }
+
+  # Check tcp_options
+  tcp_options = rule.tcp_options else []
+  if length(tcp_options) == 0 {
+    return true # All ports open for TCP from 0.0.0.0/0, including 22
+  }
+  
+  tcp_option = tcp_options[0]
+  
+  # Default min is 1, max is 65535 if not specified
+  min_port = tcp_option.min else 1
+  max_port = tcp_option.max else 65535
+
+  # Check if 22 is within the range
+  if min_port <= 22 and max_port >= 22 {
+    return true
+  }
+  
+  return false
+}
+
+# Constraint: Block any ingress rule that allows 0.0.0.0/0 on port 22
+deny_ssh_open_to_world = rule {
+  all security_lists as address, rc {
+    all (rc.change.after.ingress_security_rules else []) as r {
+      not is_ssh_open_to_world(r)
+    }
+  }
+}
+
+# Constraint: Ensure all resources have a mandatory tag: Project: DevSecOps_Showcase
+mandatory_tags = rule {
+  all all_resources as address, rc {
+    (rc.change.after.freeform_tags else null) is not null and
+    (rc.change.after.freeform_tags["Project"] else "") == "DevSecOps_Showcase"
+  }
+}
+
+# Main rule
+main = rule {
+  deny_ssh_open_to_world and mandatory_tags
+}

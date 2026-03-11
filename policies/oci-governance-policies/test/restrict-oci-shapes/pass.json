@@ -1,0 +1,15 @@
+{
+  "resource_changes": [
+    {
+      "type": "oci_core_instance",
+      "mode": "managed",
+      "name": "free_tier_server",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "shape": "VM.Standard.A1.Flex"
+        }
+      }
+    }
+  ]
+}

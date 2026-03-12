@@ -1,8 +1,8 @@
 terraform {
   cloud {
-    organization = "DevSecOps_Pipeline_Project"
+    organization = "NateFlux"
     workspaces {
-      name = "DevSecOps_Pipeline_Project"
+      name = "NateFlux"
     }
   }
 

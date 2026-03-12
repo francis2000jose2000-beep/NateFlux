@@ -1,9 +1,9 @@
 terraform {
   cloud {
-    organization = "DevSecOps_Pipeline_Project"
+    organization = "NateFlux"
 
     workspaces {
-      name = "DevSecOps_Pipeline_Project"
+      name = "NateFlux"
     }
   }
 }
@@ -12,6 +12,6 @@ terraform {
 # It proves your Next.js app is talking to Terraform!
 resource "null_resource" "orchestration_test" {
   provisioner "local-exec" {
-    command = "echo 'Success: DevSecOps Orchestrator has triggered Terraform!'"
+    command = "echo 'Success: NateFlux has triggered Terraform!'"
   }
 }

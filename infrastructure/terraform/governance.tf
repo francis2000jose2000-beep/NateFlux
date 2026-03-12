@@ -4,14 +4,14 @@ data "tfe_slug" "policies" {
 }
 
 data "tfe_workspace" "microservice" {
-  name         = "DevSecOps_Pipeline_Project"
-  organization = "DevSecOps_Pipeline_Project"
+  name         = "NateFlux"
+  organization = "NateFlux"
 }
 
 resource "tfe_policy_set" "governance" {
   name          = "oci-governance-policies"
   description   = "Sentinel policies for OCI governance, enforcing security and compliance standards."
-  organization  = "DevSecOps_Pipeline_Project"
+  organization  = "NateFlux"
   slug          = data.tfe_slug.policies
   workspace_ids = [data.tfe_workspace.microservice.id]
   overridable   = false

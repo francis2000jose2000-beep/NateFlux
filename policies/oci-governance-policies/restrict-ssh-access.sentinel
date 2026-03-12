@@ -52,11 +52,11 @@ deny_ssh_open_to_world = rule {
   }
 }
 
-# Constraint: Ensure all resources have a mandatory tag: Project: DevSecOps_Showcase
+# Constraint: Ensure all resources have a mandatory tag: Project: NateFlux
 mandatory_tags = rule {
   all all_resources as address, rc {
     (rc.change.after.freeform_tags else null) is not null and
-    (rc.change.after.freeform_tags["Project"] else "") == "DevSecOps_Showcase"
+    (rc.change.after.freeform_tags["Project"] else "") == "NateFlux"
   }
 }
 

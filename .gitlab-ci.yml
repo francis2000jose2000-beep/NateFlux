@@ -5,20 +5,20 @@ stages:
 variables:
   SCAN_TYPE: "Static Analysis"
 
-# This job simulates the security scan
+# Job 1: Security Scan
 run_security_scan:
   stage: scan
   image: alpine:latest
   script:
     - echo "Orchestrating DevSecOps Scan..."
-    - echo "Target Repository: $TARGET_REPO_URL"
+    - echo "Target Repository - $TARGET_REPO_URL"
     - sleep 2
-    - echo "Scan Status: SUCCESS - No vulnerabilities found."
+    - echo "Scan Status - SUCCESS"
 
-# This job notifies Terraform (if needed)
+# Job 2: Terraform Trigger
 trigger_terraform:
   stage: deploy
   image: alpine:latest
   script:
-    - echo "Notifying HCP Terraform Workspace: $TFC_WORKSPACE_ID"
+    - echo "Notifying HCP Terraform Workspace - $TFC_WORKSPACE_ID"
     - echo "VCS-driven run initiated."

@@ -8,9 +8,9 @@ terraform {
   }
 }
 
-# A "Null Resource" does nothing but prove the pipeline works.
-resource "null_resource" "orchestration_test" {
+# This is a "dummy" resource that just proves the connection works.
+resource "null_resource" "pipeline_test" {
   provisioner "local-exec" {
-    command = "echo 'Success: DevSecOps Orchestrator has successfully triggered Terraform!'"
+    command = "echo 'DevSecOps Pipeline Triggered Successfully!'"
   }
 }

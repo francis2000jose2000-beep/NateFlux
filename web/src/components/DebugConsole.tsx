@@ -20,8 +20,8 @@ export function DebugConsole({ logs }: DebugConsoleProps) {
   if (recentLogs.length === 0) return null;
 
   return (
-    <div className="mt-10 w-full max-w-6xl mx-auto border border-zinc-800 bg-zinc-900/50 rounded-lg overflow-hidden">
-      <div className="px-4 py-2 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
+    <div className="mt-10 w-full max-w-6xl mx-auto border border-zinc-800 bg-zinc-900/50 backdrop-blur-md rounded-lg overflow-hidden">
+      <div className="px-4 py-2 bg-zinc-900/80 border-b border-zinc-800 flex items-center justify-between">
         <h3 className="text-xs font-mono font-semibold text-zinc-400 uppercase tracking-wider">
           Debug Console
         </h3>

@@ -37,7 +37,7 @@ export function ScanHero({
           compliance report. Temporary clone directories are always cleaned up.
         </p>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
+        <div className="mt-8 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
           <label className="block text-left text-xs font-medium text-zinc-300">
             Repository URL
           </label>

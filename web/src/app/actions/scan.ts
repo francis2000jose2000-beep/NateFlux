@@ -48,8 +48,8 @@ export async function triggerGitLabScan(repoUrl: string): Promise<ScanResponse> 
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'PRIVATE-TOKEN': triggerToken,
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             ref,

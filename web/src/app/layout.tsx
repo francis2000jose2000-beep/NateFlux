@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import LiquidChrome from "@/components/LiquidChrome";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +29,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className="fixed inset-0 -z-10">
+          <LiquidChrome 
+            baseColor={[0.1, 0.1, 0.1]}
+            speed={0.35}
+            amplitude={0.3}
+            frequencyX={3}
+            frequencyY={3}
+            interactive={false}
+          />
+        </div>
         {children}
       </body>
     </html>

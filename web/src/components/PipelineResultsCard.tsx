@@ -52,9 +52,11 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
   useEffect(() => {
     if (retryCountdown === null) return;
     if (retryCountdown <= 0) {
-      setRetryCountdown(null);
-      onRetry?.();
-      return;
+      const t = setTimeout(() => {
+        setRetryCountdown(null);
+        onRetry?.();
+      }, 0);
+      return () => clearTimeout(t);
     }
     const timer = setTimeout(() => setRetryCountdown(retryCountdown - 1), 1000);
     return () => clearTimeout(timer);
@@ -177,7 +179,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
   const isInitializing = safeStatus && safeStatus.ok && (safeStatus.status === 'created' || safeStatus.status === 'pending');
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
+    <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <div className="text-sm font-semibold text-zinc-100">Results</div>

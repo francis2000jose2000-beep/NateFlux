@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
 
 interface LiquidChromeProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -23,6 +23,9 @@ export const LiquidChrome = ({
   ...props
 }: LiquidChromeProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Memoize baseColor to prevent dependency array changes on re-renders
+  const memoizedBaseColor = useMemo(() => baseColor, [baseColor[0], baseColor[1], baseColor[2]]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -83,7 +86,7 @@ export const LiquidChrome = ({
         uResolution: {
           value: new Float32Array([gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height])
         },
-        uBaseColor: { value: new Float32Array(baseColor) },
+        uBaseColor: { value: new Float32Array(memoizedBaseColor) },
         uAmplitude: { value: amplitude },
         uFrequencyX: { value: frequencyX },
         uFrequencyY: { value: frequencyY },
@@ -152,7 +155,7 @@ export const LiquidChrome = ({
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
+  }, [memoizedBaseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
 
   return <div ref={containerRef} className={`w-full h-full ${className || ''}`} style={{ border: '2px solid red' }} {...props} />;
 };

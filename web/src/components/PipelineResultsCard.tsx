@@ -117,7 +117,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
 
   if (safeError) {
     return (
-      <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-5 text-sm text-rose-200">
+      <div className="glass-card rounded-2xl border border-rose-500/20 bg-rose-500/10 p-5 text-sm text-rose-200">
         {safeError}
         {safeError.includes("Reference not found") && (
           <div className="mt-2 font-medium text-rose-300">
@@ -131,7 +131,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
 
   if (fallbackStatus) {
     return (
-      <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-5 text-sm text-amber-200">
+      <div className="glass-card rounded-2xl border border-amber-500/20 bg-amber-500/10 p-5 text-sm text-amber-200">
         {fallbackStatus}
         {renderDebugConsole()}
       </div>
@@ -140,7 +140,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
 
   if (!trigger) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-sm text-zinc-400">
+      <div className="glass-card rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-sm text-zinc-400">
         Run a scan to see pipeline results.
       </div>
     );
@@ -149,7 +149,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
   if (!trigger.ok) {
     const msg = String(trigger.error?.message || "Unknown trigger error");
     return (
-      <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-5 text-sm text-rose-200">
+      <div className="glass-card rounded-2xl border border-rose-500/20 bg-rose-500/10 p-5 text-sm text-rose-200">
         {msg}
         {msg.includes("Reference not found") && (
           <div className="mt-2 font-medium text-rose-300">
@@ -179,7 +179,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
   const isInitializing = safeStatus && safeStatus.ok && (safeStatus.status === 'created' || safeStatus.status === 'pending');
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
+    <div className="glass-card rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <div className="text-sm font-semibold text-zinc-100">Results</div>

@@ -29,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="fixed inset-0 -z-[1] h-screen w-screen">
+        <div className="fixed inset-0 -z-10 h-screen w-screen">
           <LiquidChrome 
             baseColor={[0.1, 0.1, 0.1]}
             speed={0.35}
@@ -39,7 +39,7 @@ export default function RootLayout({
             interactive={false}
           />
         </div>
-        {children}
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );

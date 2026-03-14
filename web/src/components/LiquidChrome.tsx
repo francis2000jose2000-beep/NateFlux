@@ -23,9 +23,11 @@ export const LiquidChrome = ({
   ...props
 }: LiquidChromeProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Memoize baseColor to prevent dependency array changes on re-renders
-  const memoizedBaseColor = useMemo(() => baseColor, [baseColor[0], baseColor[1], baseColor[2]]);
+  const [baseColorR, baseColorG, baseColorB] = baseColor;
+  const memoizedBaseColor = useMemo<[number, number, number]>(
+    () => [baseColorR, baseColorG, baseColorB],
+    [baseColorR, baseColorG, baseColorB],
+  );
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -58,21 +60,12 @@ export const LiquidChrome = ({
 
       void main() {
           vec2 uv = vUv;
-          
-          // Basic ripple effect
           vec2 mouse = uMouse;
           float dist = distance(uv, mouse);
           float ripple = sin(dist * 10.0 - uTime * 2.0) * 0.05;
-          
-          // Apply distortion
           uv += ripple * uAmplitude;
-          
-          // Simple shine effect
           float shine = sin(uv.x * uFrequencyX + uTime) * cos(uv.y * uFrequencyY + uTime) * uAmplitude;
-          
-          // Final color mixing
-          vec3 color = uBaseColor + vec3(shine * 0.5); // Add subtle shine
-          
+          vec3 color = uBaseColor + vec3(shine * 0.5);
           gl_FragColor = vec4(color, 1.0);
       }
     `;
@@ -157,7 +150,7 @@ export const LiquidChrome = ({
     };
   }, [memoizedBaseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
 
-  return <div ref={containerRef} className={`w-full h-full ${className || ''}`} style={{ border: '2px solid red' }} {...props} />;
+  return <div ref={containerRef} className={`w-full h-full ${className || ''}`} {...props} />;
 };
 
 export default LiquidChrome;

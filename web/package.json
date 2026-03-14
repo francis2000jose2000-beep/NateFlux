@@ -7,9 +7,10 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "cp -r ../infrastructure ./infra-templates && next build",
+    "build": "node scripts/copy-infra-templates.mjs && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

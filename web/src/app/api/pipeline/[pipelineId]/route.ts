@@ -9,15 +9,31 @@ export async function GET(
   const projectId = process.env.GITLAB_PROJECT_ID;
   const apiToken = process.env.GITLAB_TOKEN;
 
-  if (!projectId || !apiToken) {
+  // 1. Validate GITLAB_PROJECT_ID existence
+  if (!projectId) {
+    console.error("Error: GITLAB_PROJECT_ID is not defined in environment variables.");
     return NextResponse.json(
-      { ok: false, error: { message: "Server missing API read token." } },
+      { ok: false, error: { message: "Server configuration error: Missing GITLAB_PROJECT_ID" } },
+      { status: 500 }
+    );
+  }
+
+  if (!apiToken) {
+    console.error("Error: GITLAB_TOKEN is not defined in environment variables.");
+    return NextResponse.json(
+      { ok: false, error: { message: "Server configuration error: Missing GITLAB_TOKEN" } },
       { status: 500 }
     );
   }
 
   try {
-    const url = `https://gitlab.com/api/v4/projects/${projectId}/pipelines/${pipelineId}`;
+    // 2. Verify URL construction
+    const baseUrl = "https://gitlab.com/api/v4";
+    const url = `${baseUrl}/projects/${projectId}/pipelines/${pipelineId}`;
+    
+    // 3. Add debug logging
+    console.log(`Fetching GitLab API: ${url}`);
+
     const res = await fetch(
       url,
       {
@@ -31,6 +47,7 @@ export async function GET(
     const data = await res.json();
 
     if (!res.ok) {
+      console.error(`[API] GitLab API error: ${res.status} ${res.statusText}`, data);
       return NextResponse.json(
         { 
           ok: false, 
@@ -46,8 +63,11 @@ export async function GET(
     // Fetch jobs for detailed status
     let jobs: JobInfo[] = [];
     try {
+      const jobsUrl = `${baseUrl}/projects/${projectId}/pipelines/${pipelineId}/jobs`;
+      // console.log(`[API] Fetching pipeline jobs from: ${jobsUrl}`);
+      
       const jobsRes = await fetch(
-        `https://gitlab.com/api/v4/projects/${projectId}/pipelines/${pipelineId}/jobs`,
+        jobsUrl,
         {
           headers: { 'PRIVATE-TOKEN': apiToken },
           cache: 'no-store'

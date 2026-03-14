@@ -20,7 +20,7 @@ export async function triggerGitLabScan(repoUrl: string): Promise<ScanResponse> 
 
   // 2. Validate Environment Variables
   const projectId = process.env.GITLAB_PROJECT_ID;
-  const triggerToken = process.env.GITLAB_TRIGGER_TOKEN;
+  const triggerToken = process.env.GITLAB_TOKEN;
 
   if (!projectId || !triggerToken) {
     console.error('Missing GitLab environment variables.');
@@ -37,7 +37,7 @@ export async function triggerGitLabScan(repoUrl: string): Promise<ScanResponse> 
   // Remove duplicates
   const uniqueRefs = [...new Set(targetRefs)];
   
-  let lastError: any = null;
+  let lastError: { type: string; message: string; details: unknown } | null = null;
 
   for (const ref of uniqueRefs) {
     try {

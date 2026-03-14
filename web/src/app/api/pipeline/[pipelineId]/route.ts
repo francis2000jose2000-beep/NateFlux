@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import type { PipelineStatusResponse, JobInfo } from "@/shared/pipelineTypes";
+import type { PipelineStatusResponse, JobInfo, GitLabPipelineStatus } from "@/shared/pipelineTypes";
 
 export async function GET(
   request: Request,
@@ -7,7 +7,7 @@ export async function GET(
 ) {
   const { pipelineId } = await params;
   const projectId = process.env.GITLAB_PROJECT_ID;
-  const apiToken = process.env.GITLAB_API_TOKEN;
+  const apiToken = process.env.GITLAB_TOKEN;
 
   if (!projectId || !apiToken) {
     return NextResponse.json(
@@ -57,10 +57,10 @@ export async function GET(
       if (jobsRes.ok) {
         const jobsData = await jobsRes.json();
         if (Array.isArray(jobsData)) {
-          jobs = jobsData.map((job: any) => ({
+          jobs = jobsData.map((job: { id: number; name: string; status: string; web_url: string }) => ({
             id: job.id,
             name: job.name,
-            status: job.status,
+            status: job.status as GitLabPipelineStatus,
             webUrl: job.web_url
           }));
         }

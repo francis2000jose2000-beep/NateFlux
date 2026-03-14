@@ -148,6 +148,53 @@ export async function triggerScan(repoUrl: string): Promise<TriggerScanResult> {
       };
     }
 
+    // Poll Configuration Version Status
+    let cvStatus = 'pending';
+    let attempts = 0;
+    const maxAttempts = 20; // Approx 40-60 seconds timeout
+    
+    while (cvStatus !== 'uploaded' && attempts < maxAttempts) {
+        attempts++;
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+
+        const checkCvResponse = await fetch(`https://app.terraform.io/api/v2/configuration-versions/${configVersionId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${tfcToken}`,
+                'Content-Type': 'application/vnd.api+json',
+            }
+        });
+
+        if (!checkCvResponse.ok) {
+            console.error('Failed to check CV status:', await checkCvResponse.text());
+            continue; // Retry on transient network errors
+        }
+
+        const checkCvData = await checkCvResponse.json();
+        cvStatus = checkCvData.data.attributes.status;
+        console.log(`Polling CV Status (Attempt ${attempts}):`, cvStatus);
+
+        if (cvStatus === 'errored') {
+             return {
+                ok: false,
+                error: {
+                    message: 'Configuration Version upload failed (errored status)',
+                    source: 'Terraform'
+                }
+            };
+        }
+    }
+
+    if (cvStatus !== 'uploaded') {
+        return {
+            ok: false,
+            error: {
+                message: 'Timeout waiting for Configuration Version to process',
+                source: 'Terraform'
+            }
+        };
+    }
+
     // Step 3: Trigger Run
     // Only after the upload is successful, trigger the run.
     const runsUrl = 'https://app.terraform.io/api/v2/runs';

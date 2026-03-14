@@ -40,6 +40,8 @@
     "node_modules",
     "vitest.config.ts",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "infra-templates",
+    "infra-templates/**/*"
   ]
 }

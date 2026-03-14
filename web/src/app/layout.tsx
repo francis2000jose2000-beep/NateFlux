@@ -29,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="fixed inset-0 -z-10 h-screen w-screen overflow-hidden bg-[#000000]">
+        <div className="fixed inset-0 -z-10 h-screen w-screen bg-black">
           <PixelSnow
             color="#ffffff"
             flakeSize={0.009}

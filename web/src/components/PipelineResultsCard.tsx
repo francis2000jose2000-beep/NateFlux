@@ -30,7 +30,7 @@ function getStatusText(status: GitLabPipelineStatus) {
 
 function CheckRow({ label, state }: { label: string; state: CheckState }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+    <div className="glass-card flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl px-4 py-3">
       <div className="text-sm text-zinc-200">{label}</div>
       <div className={`rounded-full px-3 py-1 text-xs ${checkPillColor(state)}`}>{titleCase(state)}</div>
     </div>
@@ -76,7 +76,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
     // 1. If we have explicit rawError (from catch blocks or 422 manual action required)
     if (rawError) {
       return (
-        <div className="mt-4 overflow-hidden rounded-lg border border-white/10 bg-black/40 text-xs font-mono text-zinc-400">
+        <div className="glass-card mt-4 overflow-hidden rounded-lg border border-white/10 bg-zinc-900/40 backdrop-blur-xl text-xs font-mono text-zinc-400">
           <div className="border-b border-white/10 bg-white/5 px-3 py-2 font-semibold text-zinc-300">Debug Console</div>
           <div className="overflow-x-auto p-3">
             <pre>{JSON.stringify(rawError, null, 2)}</pre>
@@ -92,7 +92,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
           <h3 className="mb-2 text-sm font-semibold text-zinc-100">Live Log Panel</h3>
           <div className="grid gap-4 md:grid-cols-2">
             {!!trigger.gitlabData && (
-              <div className="overflow-hidden rounded-lg border border-white/10 bg-black/40 text-xs font-mono text-zinc-400">
+              <div className="glass-card overflow-hidden rounded-lg border border-white/10 bg-zinc-900/40 backdrop-blur-xl text-xs font-mono text-zinc-400">
                 <div className="border-b border-white/10 bg-white/5 px-3 py-2 font-semibold text-zinc-300">GitLab Response</div>
                 <div className="max-h-60 overflow-y-auto overflow-x-auto p-3">
                   <pre>{JSON.stringify(trigger.gitlabData, null, 2)}</pre>
@@ -100,7 +100,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
               </div>
             )}
             {!!trigger.tfcData && (
-              <div className="overflow-hidden rounded-lg border border-white/10 bg-black/40 text-xs font-mono text-zinc-400">
+              <div className="glass-card overflow-hidden rounded-lg border border-white/10 bg-zinc-900/40 backdrop-blur-xl text-xs font-mono text-zinc-400">
                 <div className="border-b border-white/10 bg-white/5 px-3 py-2 font-semibold text-zinc-300">Terraform Response</div>
                 <div className="max-h-60 overflow-y-auto overflow-x-auto p-3">
                   <pre>{JSON.stringify(trigger.tfcData, null, 2)}</pre>
@@ -179,7 +179,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
   const isInitializing = safeStatus && safeStatus.ok && (safeStatus.status === 'created' || safeStatus.status === 'pending');
 
   return (
-    <div className="glass-card rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-md p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
+    <div className="glass-card rounded-2xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <div className="text-sm font-semibold text-zinc-100">Results</div>
@@ -245,7 +245,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
                <div>Status</div>
              </div>
              {safeStatus.jobs.map(job => (
-               <div key={job.id} className="grid grid-cols-[1fr_auto] items-center rounded-lg bg-white/5 px-4 py-2 text-sm transition hover:bg-white/10">
+               <div key={job.id} className="grid grid-cols-[1fr_auto] items-center rounded-lg bg-zinc-900/40 px-4 py-2 text-sm transition hover:bg-zinc-900/55">
                  <div className="flex items-center gap-2">
                     <span className="text-zinc-200">{job.name}</span>
                     <a href={job.webUrl} target="_blank" rel="noreferrer" className="text-xs text-indigo-400 hover:underline opacity-50 hover:opacity-100">#{job.id}</a>

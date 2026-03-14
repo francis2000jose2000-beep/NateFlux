@@ -213,15 +213,13 @@ export default function PixelSnow({
   style,
   ...props
 }: PixelSnowProps) {
-  const resolvedColor = color === "#ffffff" ? color : "#ffffff";
   const containerRef = useRef<HTMLDivElement | null>(null);
   const animationRef = useRef<number>(0);
-  const isVisibleRef = useRef<boolean>(true);
   const rendererRef = useRef<WebGLRenderer | null>(null);
   const materialRef = useRef<ShaderMaterial | null>(null);
   const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const settingsRef = useRef<PixelSnowSettings>({
-    color: resolvedColor,
+    color,
     flakeSize,
     minFlakeSize,
     pixelResolution,
@@ -240,13 +238,13 @@ export default function PixelSnow({
   }, [variant]);
 
   const colorVector = useMemo(() => {
-    const threeColor = new Color(resolvedColor);
+    const threeColor = new Color(color);
     return new Vector3(threeColor.r, threeColor.g, threeColor.b);
-  }, [resolvedColor]);
+  }, [color]);
 
   useEffect(() => {
     settingsRef.current = {
-      color: resolvedColor,
+      color,
       flakeSize,
       minFlakeSize,
       pixelResolution,
@@ -259,7 +257,7 @@ export default function PixelSnow({
       variant,
       direction,
     };
-  }, [brightness, depthFade, density, direction, farPlane, flakeSize, gamma, minFlakeSize, pixelResolution, resolvedColor, speed, variant]);
+  }, [brightness, color, depthFade, density, direction, farPlane, flakeSize, gamma, minFlakeSize, pixelResolution, speed, variant]);
 
   const handleResize = useCallback(() => {
     if (resizeTimeoutRef.current) clearTimeout(resizeTimeoutRef.current);
@@ -281,18 +279,6 @@ export default function PixelSnow({
     const container = containerRef.current;
     if (!container) return;
 
-    const observer = new IntersectionObserver(([entry]) => {
-      isVisibleRef.current = entry.isIntersecting;
-    });
-
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
     const settings = settingsRef.current;
     const scene = new Scene();
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -306,8 +292,17 @@ export default function PixelSnow({
     });
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(container.offsetWidth, container.offsetHeight);
+    const initialRect = container.getBoundingClientRect();
+    const initialW = Math.max(1, Math.floor(initialRect.width || container.offsetWidth || window.innerWidth));
+    const initialH = Math.max(1, Math.floor(initialRect.height || container.offsetHeight || window.innerHeight));
+    renderer.setSize(initialW, initialH);
     renderer.setClearColor(0x000000, 0);
+    renderer.domElement.style.position = "absolute";
+    renderer.domElement.style.inset = "0";
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
+    renderer.domElement.style.display = "block";
+    renderer.domElement.style.opacity = "1";
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -320,7 +315,7 @@ export default function PixelSnow({
       fragmentShader,
       uniforms: {
         uTime: { value: 0 },
-        uResolution: { value: new Vector2(container.offsetWidth, container.offsetHeight) },
+        uResolution: { value: new Vector2(initialW, initialH) },
         uFlakeSize: { value: settings.flakeSize },
         uMinFlakeSize: { value: settings.minFlakeSize },
         uPixelResolution: { value: settings.pixelResolution },
@@ -346,7 +341,6 @@ export default function PixelSnow({
     const startTime = performance.now();
     const animate = () => {
       animationRef.current = requestAnimationFrame(animate);
-      if (!isVisibleRef.current) return;
       material.uniforms.uTime.value = (performance.now() - startTime) * 0.001;
       renderer.render(scene, camera);
     };

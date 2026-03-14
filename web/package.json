@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "cp -r ../infrastructure ./infra-templates && next build",
     "start": "next start",
     "lint": "next lint"
   },

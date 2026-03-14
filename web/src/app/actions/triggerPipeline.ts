@@ -84,17 +84,29 @@ export async function triggerScan(repoUrl: string): Promise<TriggerScanResult> {
     // Step 2: Package & Upload
     // Package infrastructure/terraform/main.tf
     // Use path relative to the web root for Vercel deployment
-    const mainTfPath = path.resolve(process.cwd(), 'infrastructure/terraform/main.tf');
+    // Update: Using infra-templates injected during build time
+    const mainTfPath = path.join(process.cwd(), 'infra-templates', 'terraform', 'main.tf');
 
     // Ensure file exists
-    if (!fs.existsSync(mainTfPath)) {
-      return {
-        ok: false,
-        error: {
-          message: 'main.tf not found at ' + mainTfPath,
-          source: 'Terraform'
+    try {
+        if (!fs.existsSync(mainTfPath)) {
+          return {
+            ok: false,
+            error: {
+              message: 'main.tf not found at ' + mainTfPath,
+              source: 'Terraform'
+            }
+          };
         }
-      };
+    } catch (fsError) {
+        console.error('File system error checking main.tf:', fsError);
+        return {
+            ok: false,
+            error: {
+                message: 'File system error: ' + (fsError instanceof Error ? fsError.message : String(fsError)),
+                source: 'Terraform'
+            }
+        };
     }
 
     // Create tarball in memory

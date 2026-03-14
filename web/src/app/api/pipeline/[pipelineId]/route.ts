@@ -44,21 +44,30 @@ export async function GET(
       }
     );
 
-    const data = await res.json();
-
     if (!res.ok) {
-      console.error(`[API] GitLab API error: ${res.status} ${res.statusText}`, data);
+      const errorText = await res.text();
+      console.error('GitLab API Error:', res.status, res.url, errorText);
+
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { message: errorText };
+      }
+
       return NextResponse.json(
         { 
           ok: false, 
           error: { 
-            message: data.message || "Failed to fetch status.",
-            details: data
+            message: errorData.message || "Failed to fetch status.",
+            details: errorData
           } 
         },
         { status: res.status }
       );
     }
+
+    const data = await res.json();
 
     // Fetch jobs for detailed status
     let jobs: JobInfo[] = [];

@@ -73,6 +73,7 @@ export async function triggerGitLabScan(repoUrl: string): Promise<ScanResponse> 
 
       // 4. Handle GitLab API errors gracefully
       if (!response.ok) {
+        console.error('GitLab API Error:', response.status, response.url, responseText);
         // Handle YAML syntax errors (400 Bad Request)
         if (response.status === 400) {
             return {

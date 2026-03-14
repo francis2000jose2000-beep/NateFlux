@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import LiquidChrome from "@/components/LiquidChrome";
+import PixelSnow from "@/components/PixelSnow";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,14 +29,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="fixed inset-0 -z-[1] h-screen w-screen">
-          <LiquidChrome 
-            baseColor={[0.05, 0.05, 0.05]}
-            speed={0.35}
-            amplitude={0.3}
-            frequencyX={3}
-            frequencyY={3}
-            interactive={false}
+        <div className="fixed inset-0 -z-10 h-screen w-screen overflow-hidden bg-[#0a0a0a]">
+          <PixelSnow
+            color="#ffffff"
+            flakeSize={0.009}
+            minFlakeSize={1.25}
+            pixelResolution={200}
+            speed={0.85}
+            depthFade={8}
+            farPlane={20}
+            brightness={1}
+            gamma={0.4545}
+            density={0.3}
+            variant="square"
+            direction={125}
           />
         </div>
         <div className="relative z-10">{children}</div>

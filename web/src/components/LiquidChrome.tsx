@@ -10,6 +10,7 @@ interface LiquidChromeProps extends React.HTMLAttributes<HTMLDivElement> {
   frequencyX?: number;
   frequencyY?: number;
   interactive?: boolean;
+  colors?: number[];
 }
 
 export const LiquidChrome = ({
@@ -19,6 +20,7 @@ export const LiquidChrome = ({
   frequencyX = 3,
   frequencyY = 2,
   interactive = true,
+  colors = [0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8],
   className,
   ...props
 }: LiquidChromeProps) => {
@@ -46,7 +48,9 @@ export const LiquidChrome = ({
       precision highp float;
       uniform float uTime;
       uniform vec3 uResolution;
-      uniform vec3 uBaseColor;
+      uniform vec3 uColor1;
+      uniform vec3 uColor2;
+      uniform vec3 uColor3;
       uniform float uAmplitude;
       uniform float uFrequencyX;
       uniform float uFrequencyY;
@@ -68,7 +72,10 @@ export const LiquidChrome = ({
           float ripple = sin(10.0 * dist - uTime * 2.0) * 0.03;
           uv += (diff / (dist + 0.0001)) * ripple * falloff;
 
-          vec3 color = uBaseColor / abs(sin(uTime - uv.y - uv.x));
+          float t = abs(sin(uTime - uv.y - uv.x));
+          vec3 color = mix(uColor1, uColor2, t);
+          color = mix(color, uColor3, t * t);
+          
           return vec4(color, 1.0);
       }
 
@@ -95,7 +102,9 @@ export const LiquidChrome = ({
         uResolution: {
           value: new Float32Array([gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height])
         },
-        uBaseColor: { value: new Float32Array(baseColor) },
+        uColor1: { value: new Float32Array(colors.slice(0, 3)) },
+        uColor2: { value: new Float32Array(colors.slice(3, 6)) },
+        uColor3: { value: new Float32Array(colors.slice(6, 9)) },
         uAmplitude: { value: amplitude },
         uFrequencyX: { value: frequencyX },
         uFrequencyY: { value: frequencyY },
@@ -164,7 +173,7 @@ export const LiquidChrome = ({
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
+  }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive, colors]);
 
   return <div ref={containerRef} className={`w-full h-full ${className || ''}`} {...props} />;
 };

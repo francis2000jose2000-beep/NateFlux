@@ -29,9 +29,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="fixed inset-0 -z-10">
+        <div className="fixed inset-0 -z-10 h-screen w-screen">
           <LiquidChrome 
             baseColor={[0.1, 0.1, 0.1]}
+            colors={[0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8]}
             speed={0.35}
             amplitude={0.3}
             frequencyX={3}

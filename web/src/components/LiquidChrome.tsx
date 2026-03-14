@@ -10,7 +10,6 @@ interface LiquidChromeProps extends React.HTMLAttributes<HTMLDivElement> {
   frequencyX?: number;
   frequencyY?: number;
   interactive?: boolean;
-  colors?: number[];
 }
 
 export const LiquidChrome = ({
@@ -20,7 +19,6 @@ export const LiquidChrome = ({
   frequencyX = 3,
   frequencyY = 2,
   interactive = true,
-  colors = [0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8],
   className,
   ...props
 }: LiquidChromeProps) => {
@@ -48,48 +46,31 @@ export const LiquidChrome = ({
       precision highp float;
       uniform float uTime;
       uniform vec3 uResolution;
-      uniform vec3 uColor1;
-      uniform vec3 uColor2;
-      uniform vec3 uColor3;
+      uniform vec3 uBaseColor;
       uniform float uAmplitude;
       uniform float uFrequencyX;
       uniform float uFrequencyY;
       uniform vec2 uMouse;
       varying vec2 vUv;
 
-      vec4 renderImage(vec2 uvCoord) {
-          vec2 fragCoord = uvCoord * uResolution.xy;
-          vec2 uv = (2.0 * fragCoord - uResolution.xy) / min(uResolution.x, uResolution.y);
-
-          for (float i = 1.0; i < 10.0; i++){
-              uv.x += uAmplitude / i * cos(i * uFrequencyX * uv.y + uTime + uMouse.x * 3.14159);
-              uv.y += uAmplitude / i * cos(i * uFrequencyY * uv.x + uTime + uMouse.y * 3.14159);
-          }
-
-          vec2 diff = (uvCoord - uMouse);
-          float dist = length(diff);
-          float falloff = exp(-dist * 20.0);
-          float ripple = sin(10.0 * dist - uTime * 2.0) * 0.03;
-          uv += (diff / (dist + 0.0001)) * ripple * falloff;
-
-          float t = abs(sin(uTime - uv.y - uv.x));
-          vec3 color = mix(uColor1, uColor2, t);
-          color = mix(color, uColor3, t * t);
-          
-          return vec4(color, 1.0);
-      }
-
       void main() {
-          vec4 col = vec4(0.0);
-          int samples = 0;
-          for (int i = -1; i <= 1; i++){
-              for (int j = -1; j <= 1; j++){
-                  vec2 offset = vec2(float(i), float(j)) * (1.0 / min(uResolution.x, uResolution.y));
-                  col += renderImage(vUv + offset);
-                  samples++;
-              }
-          }
-          gl_FragColor = col / float(samples);
+          vec2 uv = vUv;
+          
+          // Basic ripple effect
+          vec2 mouse = uMouse;
+          float dist = distance(uv, mouse);
+          float ripple = sin(dist * 10.0 - uTime * 2.0) * 0.05;
+          
+          // Apply distortion
+          uv += ripple * uAmplitude;
+          
+          // Simple shine effect
+          float shine = sin(uv.x * uFrequencyX + uTime) * cos(uv.y * uFrequencyY + uTime) * uAmplitude;
+          
+          // Final color mixing
+          vec3 color = uBaseColor + vec3(shine * 0.5); // Add subtle shine
+          
+          gl_FragColor = vec4(color, 1.0);
       }
     `;
 
@@ -102,13 +83,11 @@ export const LiquidChrome = ({
         uResolution: {
           value: new Float32Array([gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height])
         },
-        uColor1: { value: new Float32Array(colors.slice(0, 3)) },
-        uColor2: { value: new Float32Array(colors.slice(3, 6)) },
-        uColor3: { value: new Float32Array(colors.slice(6, 9)) },
+        uBaseColor: { value: new Float32Array(baseColor) },
         uAmplitude: { value: amplitude },
         uFrequencyX: { value: frequencyX },
         uFrequencyY: { value: frequencyY },
-        uMouse: { value: new Float32Array([0, 0]) }
+        uMouse: { value: new Float32Array([0.5, 0.5]) }
       }
     });
     const mesh = new Mesh(gl, { geometry, program });
@@ -173,9 +152,9 @@ export const LiquidChrome = ({
       }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
-  }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive, colors]);
+  }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
 
-  return <div ref={containerRef} className={`w-full h-full ${className || ''}`} {...props} />;
+  return <div ref={containerRef} className={`w-full h-full ${className || ''}`} style={{ border: '2px solid red' }} {...props} />;
 };
 
 export default LiquidChrome;

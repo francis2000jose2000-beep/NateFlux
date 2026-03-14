@@ -48,7 +48,7 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
+  --background: transparent;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -83,7 +83,7 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: transparent;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -121,7 +121,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-transparent text-foreground;
+    background: transparent !important;
+    @apply text-foreground;
   }
   html {
     @apply font-sans;

@@ -42,20 +42,20 @@ export async function triggerGitLabScan(repoUrl: string): Promise<ScanResponse> 
   for (const ref of uniqueRefs) {
     try {
       // 3. Execute the secure API call to GitLab
-      const url = `https://gitlab.com/api/v4/projects/${projectId}/trigger/pipeline`;
+      const url = `https://gitlab.com/api/v4/projects/${projectId}/pipeline`;
       const response = await fetch(
         url,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'PRIVATE-TOKEN': triggerToken,
           },
           body: JSON.stringify({
-            token: triggerToken,
-            ref, 
-            variables: {
-              TARGET_REPO_URL: repoUrl, 
-            },
+            ref,
+            variables: [
+              { key: 'TARGET_REPO_URL', value: repoUrl }
+            ],
           }),
         }
       );

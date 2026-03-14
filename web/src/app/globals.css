@@ -123,13 +123,13 @@
     @apply border-border outline-ring/50;
   }
   body {
-    background: transparent !important;
-    background-color: transparent !important;
+    background: #000000 !important;
+    background-color: #000000 !important;
     @apply text-foreground;
   }
   html {
-    background: transparent !important;
-    background-color: transparent !important;
+    background: #000000 !important;
+    background-color: #000000 !important;
     @apply font-sans;
   }
 }
@@ -139,6 +139,6 @@
 }
 /* Re-apply solid backgrounds ONLY to specific cards so they remain readable */
 .glass-card {
-  background-color: rgba(0, 0, 0, 0.4) !important;
+  background-color: rgba(24, 24, 27, 0.5) !important;
   backdrop-filter: blur(12px) !important;
 }

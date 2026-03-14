@@ -213,6 +213,7 @@ export default function PixelSnow({
   style,
   ...props
 }: PixelSnowProps) {
+  const resolvedColor = color === "#ffffff" ? color : "#ffffff";
   const containerRef = useRef<HTMLDivElement | null>(null);
   const animationRef = useRef<number>(0);
   const isVisibleRef = useRef<boolean>(true);
@@ -220,7 +221,7 @@ export default function PixelSnow({
   const materialRef = useRef<ShaderMaterial | null>(null);
   const resizeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const settingsRef = useRef<PixelSnowSettings>({
-    color,
+    color: resolvedColor,
     flakeSize,
     minFlakeSize,
     pixelResolution,
@@ -239,13 +240,13 @@ export default function PixelSnow({
   }, [variant]);
 
   const colorVector = useMemo(() => {
-    const threeColor = new Color(color);
+    const threeColor = new Color(resolvedColor);
     return new Vector3(threeColor.r, threeColor.g, threeColor.b);
-  }, [color]);
+  }, [resolvedColor]);
 
   useEffect(() => {
     settingsRef.current = {
-      color,
+      color: resolvedColor,
       flakeSize,
       minFlakeSize,
       pixelResolution,
@@ -258,7 +259,7 @@ export default function PixelSnow({
       variant,
       direction,
     };
-  }, [brightness, color, depthFade, density, direction, farPlane, flakeSize, gamma, minFlakeSize, pixelResolution, speed, variant]);
+  }, [brightness, depthFade, density, direction, farPlane, flakeSize, gamma, minFlakeSize, pixelResolution, resolvedColor, speed, variant]);
 
   const handleResize = useCallback(() => {
     if (resizeTimeoutRef.current) clearTimeout(resizeTimeoutRef.current);

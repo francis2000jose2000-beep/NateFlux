@@ -179,7 +179,7 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
   const isInitializing = safeStatus && safeStatus.ok && (safeStatus.status === 'created' || safeStatus.status === 'pending');
 
   return (
-    <div className="glass-card rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
+    <div className="glass-card rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-md p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <div className="text-sm font-semibold text-zinc-100">Results</div>

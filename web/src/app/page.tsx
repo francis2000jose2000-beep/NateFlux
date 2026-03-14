@@ -251,9 +251,7 @@ export default function Home() {
   }, [triggerResult]);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.20),transparent_60%)]" />
-      <div className="pointer-events-none fixed inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.0),rgba(0,0,0,0.55))]" />
+    <div className="min-h-screen text-zinc-50">
 
       <header className="relative mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-2">

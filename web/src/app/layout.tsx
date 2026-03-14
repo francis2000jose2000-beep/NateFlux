@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <div className="fixed inset-0 -z-10 h-screen w-screen">
           <LiquidChrome 
-            baseColor={[0.1, 0.1, 0.1]}
+            baseColor={[0.03, 0.03, 0.03]}
             speed={0.35}
             amplitude={0.3}
             frequencyX={3}

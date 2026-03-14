@@ -303,6 +303,8 @@ export default function PixelSnow({
     renderer.domElement.style.height = "100%";
     renderer.domElement.style.display = "block";
     renderer.domElement.style.opacity = "1";
+    renderer.domElement.style.zIndex = "0";
+    renderer.domElement.style.filter = "drop-shadow(0 0 2px white)";
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 

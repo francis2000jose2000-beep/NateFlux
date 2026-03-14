@@ -48,21 +48,21 @@
 }
 
 :root {
-  background: transparent !important;
-  --background: transparent !important;
-  --foreground: oklch(0.145 0 0);
+  background: #000000 !important;
+  --background: #000000 !important;
+  --foreground: #ffffff !important;
   --card: transparent !important;
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: #ffffff !important;
   --popover: transparent !important;
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --popover-foreground: #ffffff !important;
+  --primary: #ffffff !important;
+  --primary-foreground: #000000 !important;
   --secondary: transparent !important;
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary-foreground: #ffffff !important;
   --muted: transparent !important;
   --muted-foreground: oklch(0.556 0 0);
   --accent: transparent !important;
-  --accent-foreground: oklch(0.205 0 0);
+  --accent-foreground: #ffffff !important;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: transparent !important;
@@ -84,21 +84,21 @@
 }
 
 .dark {
-  background: transparent !important;
-  --background: transparent !important;
-  --foreground: oklch(0.985 0 0);
+  background: #000000 !important;
+  --background: #000000 !important;
+  --foreground: #ffffff !important;
   --card: transparent !important;
-  --card-foreground: oklch(0.985 0 0);
+  --card-foreground: #ffffff !important;
   --popover: transparent !important;
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --popover-foreground: #ffffff !important;
+  --primary: #ffffff !important;
+  --primary-foreground: #000000 !important;
   --secondary: transparent !important;
-  --secondary-foreground: oklch(0.985 0 0);
+  --secondary-foreground: #ffffff !important;
   --muted: transparent !important;
   --muted-foreground: oklch(0.708 0 0);
   --accent: transparent !important;
-  --accent-foreground: oklch(0.985 0 0);
+  --accent-foreground: #ffffff !important;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: transparent !important;
@@ -123,13 +123,13 @@
     @apply border-border outline-ring/50;
   }
   body {
-    background: #000000 !important;
-    background-color: #000000 !important;
+    background: transparent !important;
+    background-color: transparent !important;
     @apply text-foreground;
   }
   html {
-    background: #000000 !important;
-    background-color: #000000 !important;
+    background: transparent !important;
+    background-color: transparent !important;
     @apply font-sans;
   }
 }
@@ -141,4 +141,10 @@
 .glass-card {
   background-color: rgba(24, 24, 27, 0.4) !important;
   backdrop-filter: blur(24px) !important;
+}
+
+html,
+body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
 }

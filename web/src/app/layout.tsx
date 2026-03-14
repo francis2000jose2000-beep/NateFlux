@@ -27,9 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-transparent`}
       >
-        <div className="fixed inset-0 -z-10 h-screen w-screen bg-black">
+        <div
+          className="fixed inset-0 -z-10 h-screen w-screen overflow-hidden bg-[#000000] !bg-black"
+          style={{ zIndex: 0 }}
+        >
           <PixelSnow
             color="#ffffff"
             flakeSize={0.009}

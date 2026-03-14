@@ -32,7 +32,7 @@ export async function triggerGitLabScan(repoUrl: string): Promise<ScanResponse> 
 
   // 3. Determine the ref to use: GITLAB_TRIGGER_REF -> main -> master
   // User requested to ensure ref is set to 'main'
-  const targetRefs = ['main'];
+  const targetRefs = [process.env.GITLAB_BRANCH || 'main'];
 
   // Remove duplicates
   const uniqueRefs = [...new Set(targetRefs)];
@@ -74,6 +74,9 @@ export async function triggerGitLabScan(repoUrl: string): Promise<ScanResponse> 
       // 4. Handle GitLab API errors gracefully
       if (!response.ok) {
         console.error('GitLab API Error:', response.status, response.url, responseText);
+        if (response.status === 404) {
+             throw new Error(`GitLab 404: Tried to fetch ${url} but got: ${responseText}`);
+        }
         // Handle YAML syntax errors (400 Bad Request)
         if (response.status === 400) {
             return {

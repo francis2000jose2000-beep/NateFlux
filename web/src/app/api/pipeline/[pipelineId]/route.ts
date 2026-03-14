@@ -55,16 +55,11 @@ export async function GET(
         errorData = { message: errorText };
       }
 
-      return NextResponse.json(
-        { 
-          ok: false, 
-          error: { 
-            message: errorData.message || "Failed to fetch status.",
-            details: errorData
-          } 
-        },
-        { status: res.status }
-      );
+      const errorMsg = res.status === 404 
+        ? `GitLab 404: URL ${res.url} not found. Response: ${errorText}`
+        : errorData.message || "Failed to fetch status.";
+     
+      return NextResponse.json({ ok: false, error: { message: errorMsg, details: errorData } }, { status: res.status });
     }
 
     const data = await res.json();

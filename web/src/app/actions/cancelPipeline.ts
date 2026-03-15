@@ -17,6 +17,13 @@ export interface CancelPipelineResponse {
 }
 
 export async function cancelGitLabPipeline(pipelineId: number): Promise<CancelPipelineResponse> {
+  // --- DEMO MODE INTERCEPT ---
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || pipelineId > 2000000000) {
+    console.log('--- DEMO MODE: Mocking Cancel ---');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return { success: true };
+  }
+
   const token = process.env.GITLAB_TOKEN;
   const pId = process.env.GITLAB_PROJECT_ID;
 

@@ -224,11 +224,11 @@ export function PipelineResultsCard({ trigger, status, isPolling, errorMessage, 
         />
         <CheckRow
           label="Sentinel policy tests"
-          state={safeStatus && safeStatus.ok ? safeStatus.checks.sentinel : isPolling ? "running" : "unknown"}
+          state={safeStatus && safeStatus.ok ? (safeStatus.checks?.sentinel || 'pending') : isPolling ? "running" : "unknown"}
         />
         <CheckRow
           label="Infrastructure"
-          state={trigger?.ok ? "passed" : (safeStatus && safeStatus.ok ? safeStatus.checks.terraform : isPolling ? "running" : "unknown")}
+          state={trigger?.ok ? "passed" : (safeStatus && safeStatus.ok ? (safeStatus.checks?.terraform || 'pending') : isPolling ? "running" : "unknown")}
         />
       </div>
 

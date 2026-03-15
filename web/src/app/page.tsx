@@ -58,6 +58,12 @@ export default function Home() {
   const [isCanceling, setIsCanceling] = useState(false);
   const pollStartedAtRef = useRef<number | null>(null);
 
+  // Hydration Fix: Track mounted state
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const appendAuditLog = (id: number, status: string) => {
     setAuditLog(prev => {
       const newEntry = { id, status, time: new Date().toLocaleTimeString() };
@@ -150,10 +156,10 @@ export default function Home() {
         };
         
         setSuccessfulRuns(prev => {
-          const newRuns = [newRun, ...prev].slice(0, 5);
-          localStorage.setItem('nateflux_successful_runs', JSON.stringify(newRuns));
-          return newRuns;
+          const newRuns = prev.some(r => r.pipelineId === newRun.pipelineId) ? prev : [newRun, ...prev];
+          return newRuns.slice(0, 5);
         });
+        localStorage.setItem('nateflux_successful_runs', JSON.stringify([newRun, ...successfulRuns].slice(0, 5)));
       } else {
         setActivePipelineId(null);
         const msg = res.error?.message || "";
@@ -259,6 +265,51 @@ export default function Home() {
       if (cancelled) return;
       const startedAt = pollStartedAtRef.current ?? Date.now();
       pollStartedAtRef.current = startedAt;
+
+      // --- DEMO MODE POLLING ---
+      if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || Number(pipelineId) > 2000000000) { // Timestamp-based IDs are large
+          const elapsed = Date.now() - startedAt;
+          
+          if (elapsed < 5000) {
+              setPipelineStatus({ 
+                  ok: true, 
+                  status: 'running', 
+                  id: Number(pipelineId), 
+                  web_url: `https://gitlab.com/demo/pipeline/${pipelineId}`,
+                  checks: {
+                      sentinel: 'running',
+                      terraform: 'running'
+                  },
+                  jobs: [
+                      { id: 1, name: 'Trivy Scan', status: 'success', webUrl: '#' },
+                      { id: 2, name: 'Terraform Plan', status: 'running', webUrl: '#' }
+                  ]
+              });
+          } else {
+              setPipelineStatus({ 
+                  ok: true, 
+                  status: 'success', 
+                  id: Number(pipelineId), 
+                  web_url: `https://gitlab.com/demo/pipeline/${pipelineId}`,
+                  checks: {
+                      sentinel: 'passed',
+                      terraform: 'passed'
+                  },
+                  jobs: [
+                      { id: 1, name: 'Trivy Scan', status: 'success', webUrl: '#' },
+                      { id: 2, name: 'Terraform Plan', status: 'success', webUrl: '#' },
+                      { id: 3, name: 'Sentinel Policy', status: 'success', webUrl: '#' },
+                      { id: 4, name: 'Terraform Apply', status: 'success', webUrl: '#' }
+                  ]
+              });
+              setIsPolling(false);
+              setActivePipelineId(null);
+              appendAuditLog(Number(pipelineId), 'Passed (Demo)');
+              setToast({ message: 'Demo Pipeline Completed Successfully', type: 'success' });
+          }
+          return;
+      }
+
       if (Date.now() - startedAt > maxMs) {
         setIsPolling(false);
         setActivePipelineId(null);
@@ -341,7 +392,14 @@ export default function Home() {
           </div>
           <div className="text-sm font-semibold tracking-wide">NateFlux</div>
         </div>
-        <div className="text-xs text-zinc-400">DevSecOps Pipeline Orchestrator</div>
+        <div className="flex items-center gap-4">
+          {mounted && process.env.NEXT_PUBLIC_DEMO_MODE === 'true' && (
+            <span className="rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
+              Demo Mode
+            </span>
+          )}
+          <div className="text-xs text-zinc-400">DevSecOps Pipeline Orchestrator</div>
+        </div>
       </header>
 
       <main className="relative mx-auto w-full max-w-6xl px-6 pb-20">
@@ -375,8 +433,8 @@ export default function Home() {
           <div className="mt-12 border-t border-white/10 pt-8">
             <h3 className="mb-4 text-sm font-semibold text-zinc-400">Recent Successful Orchestrations</h3>
             <div className="grid gap-3">
-              {successfulRuns.map((run) => (
-                <div key={run.pipelineId} className="flex items-center justify-between rounded-lg border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl px-4 py-3 transition hover:!bg-[#060010]/55">
+              {successfulRuns.map((run, index) => (
+                <div key={`${run.pipelineId}-${index}`} className="flex items-center justify-between rounded-lg border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl px-4 py-3 transition hover:!bg-[#060010]/55">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm font-medium text-zinc-200">#{run.pipelineId}</span>
                     <span className="text-xs text-zinc-500">{run.repoUrl}</span>

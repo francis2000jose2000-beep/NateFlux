@@ -30,6 +30,18 @@ export async function triggerScan(repoUrl: string): Promise<TriggerScanResult> {
     };
   }
 
+  // --- DEMO MODE BYPASS ---
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true' && gitlabResult.pipelineId && gitlabResult.pipelineId > 2000000000) {
+      return {
+          ok: true,
+          pipelineId: gitlabResult.pipelineId,
+          webUrl: `https://gitlab.com/demo/pipeline/${gitlabResult.pipelineId}`,
+          repoUrl: repoUrl,
+          gitlabData: gitlabResult.details,
+          tfcData: { id: `run-demo-${gitlabResult.pipelineId}`, status: 'simulated' }
+      };
+  }
+
   // 2. Trigger TFC Run (API-Driven Workflow)
   const tfcToken = process.env.TFC_TOKEN;
   const workspaceId = process.env.TFC_WORKSPACE_ID;

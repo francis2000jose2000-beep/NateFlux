@@ -18,6 +18,20 @@ export async function triggerGitLabScan(repoUrl: string): Promise<ScanResponse> 
     };
   }
 
+  // --- DEMO MODE INTERCEPT ---
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    console.log('--- DEMO MODE: Mocking Trigger ---');
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate latency
+    const mockId = Date.now() + Math.floor(Math.random() * 1000); // Dynamic timestamp-based ID
+    return {
+      success: true,
+      message: '[DEMO] Scan initiated successfully.',
+      pipelineId: mockId,
+      pipelineUrl: `https://gitlab.com/demo/pipeline/${mockId}`,
+      details: { status: 'simulated' }
+    };
+  }
+
   // Strict Variable Check
   if (!process.env.GITLAB_TOKEN) throw new Error('Trigger: GITLAB_TOKEN is missing from env');
 

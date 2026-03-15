@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { checkEnv } from "@/app/actions/checkEnv";
 import { triggerScan } from "@/app/actions/triggerPipeline";
+import { cancelGitLabPipeline } from "@/app/actions/cancelPipeline";
 import { PipelineHero } from "@/components/PipelineHero";
 import { PipelineResultsCard } from "@/components/PipelineResultsCard";
 import { PipelineSkeleton } from "@/components/PipelineSkeleton";
@@ -16,6 +17,12 @@ interface SuccessfulRun {
   repoUrl: string;
   timestamp: string;
   webUrl: string;
+}
+
+interface AuditLogEntry {
+  id: number;
+  status: string;
+  time: string;
 }
 
 function getSafeErrorMessage(error: unknown): string {
@@ -46,7 +53,17 @@ export default function Home() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "info" | "error"; linkUrl?: string; linkText?: string } | null>(null);
   const [debugLogs, setDebugLogs] = useState<DebugLog[]>([]);
   const [successfulRuns, setSuccessfulRuns] = useState<SuccessfulRun[]>([]);
+  const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
+  const [activePipelineId, setActivePipelineId] = useState<number | null>(null);
+  const [isCanceling, setIsCanceling] = useState(false);
   const pollStartedAtRef = useRef<number | null>(null);
+
+  const appendAuditLog = (id: number, status: string) => {
+    setAuditLog(prev => {
+      const newEntry = { id, status, time: new Date().toLocaleTimeString() };
+      return [newEntry, ...prev].slice(0, 5);
+    });
+  };
 
   const addDebugLog = (log: Omit<DebugLog, 'timestamp'>) => {
     setDebugLogs(prev => {
@@ -113,12 +130,14 @@ export default function Home() {
     setTriggerResult(null);
     setPipelineStatus(null);
     setToast(null);
+    setActivePipelineId(null);
 
     try {
       const res = await triggerScan(repoUrl);
       
       // Debug Logging
       if (res.ok) {
+        setActivePipelineId(Number(res.pipelineId));
         if (res.gitlabData) addDebugLog({ source: 'GitLab', status: 200, data: res.gitlabData });
         if (res.tfcData) addDebugLog({ source: 'Terraform', status: 201, data: res.tfcData });
 
@@ -136,6 +155,7 @@ export default function Home() {
           return newRuns;
         });
       } else {
+        setActivePipelineId(null);
         const msg = res.error?.message || "";
         // Use explicit source from backend if available, otherwise fallback to detection
         // @ts-expect-error - source property added in backend
@@ -176,10 +196,54 @@ export default function Home() {
       setIsPolling(true);
       pollStartedAtRef.current = Date.now();
     } catch (error) {
+      setActivePipelineId(null);
       setErrorMessage(getSafeErrorMessage(error) || "Pipeline trigger failed.");
       setRawError(error);
     } finally {
       setIsTriggering(false);
+    }
+  }
+
+  async function onCancel() {
+    if (!activePipelineId) return;
+
+    setIsCanceling(true);
+    try {
+      const res = await cancelGitLabPipeline(activePipelineId);
+      
+      if (res.success) {
+        addDebugLog({ 
+          source: 'GitLab', 
+          status: 200, 
+          data: { message: `Pipeline ${activePipelineId} canceled successfully.` } 
+        });
+        
+        setToast({
+          message: "Pipeline Canceled",
+          type: "info"
+        });
+        
+        appendAuditLog(activePipelineId, "Canceled");
+        
+        // Stop polling and update local state immediately
+        setIsPolling(false);
+        setActivePipelineId(null);
+        
+        if (pipelineStatus?.ok) {
+          setPipelineStatus({
+            ...pipelineStatus,
+            status: "canceled"
+          });
+        }
+      } else {
+        setErrorMessage(getSafeErrorMessage(res.error) || "Failed to cancel pipeline.");
+        setRawError(res.details);
+      }
+    } catch (error) {
+      setErrorMessage(getSafeErrorMessage(error) || "Error cancelling pipeline.");
+      setRawError(error);
+    } finally {
+      setIsCanceling(false);
     }
   }
 
@@ -197,6 +261,8 @@ export default function Home() {
       pollStartedAtRef.current = startedAt;
       if (Date.now() - startedAt > maxMs) {
         setIsPolling(false);
+        setActivePipelineId(null);
+        if (pipelineId) appendAuditLog(Number(pipelineId), "Timed Out");
         setErrorMessage("Polling timed out. Check the pipeline in GitLab.");
         return;
       }
@@ -229,14 +295,24 @@ export default function Home() {
             data.status === "skipped"
           ) {
             setIsPolling(false);
+            setActivePipelineId(null);
+            
+            let finalStatus = data.status === "success" ? "Passed" : 
+                              data.status === "failed" ? "Failed" : 
+                              data.status === "canceled" ? "Canceled" : "Skipped";
+            appendAuditLog(Number(pipelineId), finalStatus);
           }
         } else {
           setIsPolling(false);
+          setActivePipelineId(null);
+          appendAuditLog(Number(pipelineId), "Error");
           setErrorMessage(getSafeErrorMessage(data.error.message));
           setRawError(data.error.details || data.error);
         }
       } catch (error) {
         setIsPolling(false);
+        setActivePipelineId(null);
+        appendAuditLog(Number(pipelineId), "Error");
         setErrorMessage("Failed to fetch pipeline status.");
         setRawError(error);
       }
@@ -269,7 +345,16 @@ export default function Home() {
       </header>
 
       <main className="relative mx-auto w-full max-w-6xl px-6 pb-20">
-        <PipelineHero repoUrl={repoUrl} setRepoUrl={setRepoUrl} isLoading={isTriggering || isPolling} isSuccess={isSuccess} onRun={onRun} />
+        <PipelineHero 
+          repoUrl={repoUrl} 
+          setRepoUrl={setRepoUrl} 
+          isLoading={isTriggering || isPolling} 
+          isSuccess={isSuccess} 
+          onRun={onRun}
+          onCancel={onCancel}
+          isCanceling={isCanceling}
+          showCancel={activePipelineId !== null && pipelineStatus?.ok && (pipelineStatus.status === 'running' || pipelineStatus.status === 'pending' || pipelineStatus.status === 'created')}
+        />
 
         <div className="mt-10">
           {isTriggering ? (
@@ -309,6 +394,31 @@ export default function Home() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {auditLog.length > 0 && (
+          <div className="mt-8 border-t border-white/10 pt-8">
+            <h3 className="mb-4 text-sm font-semibold text-zinc-400">Recent Activity</h3>
+            <div className="rounded-xl border border-white/10 bg-[#060010]/40 backdrop-blur-xl overflow-hidden">
+              <div className="flex flex-col divide-y divide-white/5">
+                {auditLog.map((log, i) => (
+                  <div key={`${log.id}-${i}`} className="flex items-center justify-between px-4 py-3 text-sm">
+                    <div className="flex items-center gap-4">
+                      <span className="font-mono text-zinc-500">#{log.id}</span>
+                      <span className={`font-medium ${
+                        log.status === 'Passed' ? 'text-emerald-400' :
+                        log.status === 'Failed' || log.status === 'Canceled' || log.status === 'Error' || log.status === 'Timed Out' ? 'text-red-400' :
+                        'text-zinc-400'
+                      }`}>
+                        {log.status}
+                      </span>
+                    </div>
+                    <span className="text-xs text-zinc-500">{log.time}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}

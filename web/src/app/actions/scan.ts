@@ -18,120 +18,55 @@ export async function triggerGitLabScan(repoUrl: string): Promise<ScanResponse> 
     };
   }
 
-  // 2. Validate Environment Variables
-  const projectId = process.env.GITLAB_PROJECT_ID;
-  const triggerToken = process.env.GITLAB_TOKEN;
+  // Strict Variable Check
+  if (!process.env.GITLAB_TOKEN) throw new Error('Trigger: GITLAB_TOKEN is missing from env');
 
-  if (!projectId || !triggerToken) {
-    console.error('Missing GitLab environment variables.');
-    return {
-      success: false,
-      message: 'Server configuration error. Please contact the administrator.',
-    };
-  }
+  // Debug Injection
+  console.log('--- TRIGGER DEBUG ---');
+  console.log('Token Exists:', !!process.env.GITLAB_TOKEN);
+  console.log('Token Prefix:', process.env.GITLAB_TOKEN ? process.env.GITLAB_TOKEN.substring(0, 6) : 'N/A');
+  console.log('---------------------');
 
-  // 3. Determine the ref to use: GITLAB_TRIGGER_REF -> main -> master
-  // User requested to ensure ref is set to 'main'
-  const targetRefs = [process.env.GITLAB_BRANCH || 'main'];
+  try {
+    // Strict Fetch Formatting
+    const res = await fetch(`https://gitlab.com/api/v4/projects/${process.env.GITLAB_PROJECT_ID}/pipeline?ref=main`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'PRIVATE-TOKEN': process.env.GITLAB_TOKEN
+      },
+      body: JSON.stringify({
+        variables: [
+          { key: 'TARGET_REPO_URL', value: repoUrl }
+        ],
+      }),
+    });
 
-  // Remove duplicates
-  const uniqueRefs = [...new Set(targetRefs)];
-  
-  let lastError: { type: string; message: string; details: unknown } | null = null;
-
-  for (const ref of uniqueRefs) {
-    try {
-      // 3. Execute the secure API call to GitLab
-      const url = `https://gitlab.com/api/v4/projects/${projectId}/pipeline`;
-      const response = await fetch(
-        url,
-        {
-          method: 'POST',
-          headers: {
-            'PRIVATE-TOKEN': triggerToken,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ref,
-            variables: [
-              { key: 'TARGET_REPO_URL', value: repoUrl }
-            ],
-          }),
-        }
-      );
-
-      // Log the Response
-      const responseText = await response.text();
-
-      let data;
-      try {
-          data = JSON.parse(responseText);
-      } catch (error) {
-          console.error('Failed to parse GitLab response:', error);
-          data = { message: responseText };
-      }
-
-      // 4. Handle GitLab API errors gracefully
-      if (!response.ok) {
-        console.error('GitLab API Error:', response.status, response.url, responseText);
-        if (response.status === 404) {
-             throw new Error(`GitLab 404: Tried to fetch ${url} but got: ${responseText}`);
-        }
-        // Handle YAML syntax errors (400 Bad Request)
-        if (response.status === 400) {
-            return {
-                success: false,
-                message: 'GitLab CI Syntax Error. Please check your .gitlab-ci.yml formatting.',
-                details: data,
-            };
-        }
-
-        const msg = typeof data.message === 'string' 
-            ? data.message 
-            : JSON.stringify(data.message || {});
-
-        if (msg.includes('Reference not found')) {
-            lastError = { type: 'RefNotFound', message: msg, details: data };
-            continue; // Try next ref
-        }
-
+    if (!res.ok) {
+        const text = await res.text();
+        console.error('GitLab Trigger Error:', res.status, text);
         return {
-          success: false,
-          message: typeof data.message === 'string' ? data.message : 'Failed to trigger the scanning pipeline.',
-          details: data,
+            success: false,
+            message: `GitLab Error: ${res.status} - ${text}`,
+            details: text
         };
-      }
+    }
 
-      // 5. Return success with pipeline tracking details
-      return {
+    const data = await res.json();
+    return {
         success: true,
         message: 'Scan initiated successfully.',
         pipelineId: data.id,
         pipelineUrl: data.web_url,
-        details: data,
-      };
+        details: data
+    };
 
-    } catch (error) {
-      // Catch network errors or unexpected exceptions
-      console.error('Network or parsing error during pipeline trigger:', error);
-      return {
-        success: false,
-        message: 'An unexpected network error occurred while contacting the CI/CD engine.',
-        details: error,
-      };
-    }
-  }
-
-  if (lastError && lastError.type === 'RefNotFound') {
+  } catch (error) {
+      console.error('Trigger Exception:', error);
       return {
           success: false,
-          message: 'Branch main/master not found. Check your GitLab project.',
-          details: lastError.details,
+          message: 'Exception during trigger',
+          details: error instanceof Error ? error.message : String(error)
       };
   }
-
-  return {
-      success: false,
-      message: 'Failed to trigger pipeline. Please check configuration.'
-  };
 }

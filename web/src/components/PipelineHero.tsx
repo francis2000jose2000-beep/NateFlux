@@ -4,13 +4,16 @@ type Props = {
   isLoading: boolean;
   isSuccess?: boolean;
   onRun: () => void;
+  onCancel?: () => void;
+  showCancel?: boolean;
+  isCanceling?: boolean;
 };
 
 function sanitizeRepoUrlInput(value: string) {
   return value.replace(/[)\],.\s]+$/g, "");
 }
 
-export function PipelineHero({ repoUrl, setRepoUrl, isLoading, isSuccess, onRun }: Props) {
+export function PipelineHero({ repoUrl, setRepoUrl, isLoading, isSuccess, onRun, onCancel, showCancel, isCanceling }: Props) {
   return (
     <section className="pt-12">
       <div className="mx-auto max-w-3xl text-center">
@@ -23,7 +26,7 @@ export function PipelineHero({ repoUrl, setRepoUrl, isLoading, isSuccess, onRun 
           Orchestrating secure Infrastructure-as-Code deployments via GitLab CI/CD and HCP Terraform.
         </p>
 
-        <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
+        <div className="mt-8 rounded-2xl border border-white/10 !bg-[#060010]/55 backdrop-blur-2xl p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]">
           <label className="block text-left text-xs font-medium text-zinc-300">Repository URL</label>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <input
@@ -62,10 +65,26 @@ export function PipelineHero({ repoUrl, setRepoUrl, isLoading, isSuccess, onRun 
                 "Run CI/CD Scan"
               )}
             </button>
+            {showCancel && onCancel && (
+              <button
+                type="button"
+                onClick={onCancel}
+                disabled={isCanceling}
+                className={`inline-flex h-12 items-center justify-center gap-2 rounded-xl px-5 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-60 bg-red-900/50 hover:bg-red-600/70 text-red-200 border border-red-500/30 backdrop-blur-md`}
+              >
+                {isCanceling ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-red-200/30 border-t-red-200" />
+                    Canceling...
+                  </span>
+                ) : (
+                  "Cancel Run"
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
     </section>
   );
 }
-

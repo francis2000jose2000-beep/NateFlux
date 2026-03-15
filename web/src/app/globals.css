@@ -2,6 +2,13 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+html,
+body {
+  background: #060010 !important;
+  background-color: #060010 !important;
+  color: white !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -48,8 +55,8 @@
 }
 
 :root {
-  background: #000000 !important;
-  --background: #000000 !important;
+  background: #060010 !important;
+  --background: #060010 !important;
   --foreground: #ffffff !important;
   --card: transparent !important;
   --card-foreground: #ffffff !important;
@@ -84,8 +91,8 @@
 }
 
 .dark {
-  background: #000000 !important;
-  --background: #000000 !important;
+  background: #060010 !important;
+  --background: #060010 !important;
   --foreground: #ffffff !important;
   --card: transparent !important;
   --card-foreground: #ffffff !important;
@@ -123,28 +130,27 @@
     @apply border-border outline-ring/50;
   }
   body {
-    background: transparent !important;
-    background-color: transparent !important;
     @apply text-foreground;
   }
   html {
-    background: transparent !important;
-    background-color: transparent !important;
     @apply font-sans;
   }
 }
 
-* {
-  background-color: transparent !important;
-}
 /* Re-apply solid backgrounds ONLY to specific cards so they remain readable */
 .glass-card {
-  background-color: rgba(24, 24, 27, 0.4) !important;
-  backdrop-filter: blur(24px) !important;
+  background-color: rgba(6, 0, 16, 0.4) !important;
+  backdrop-filter: blur(32px) !important;
 }
 
-html,
-body {
-  background-color: #000000 !important;
-  color: #ffffff !important;
+:root,
+.dark,
+body,
+html {
+  background-color: #060010 !important;
+  color-scheme: dark;
+}
+
+canvas {
+  display: block;
 }

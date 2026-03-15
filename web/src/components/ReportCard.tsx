@@ -19,7 +19,7 @@ export function ReportCard({ finding }: Props) {
         : String(finding.filePath);
 
   return (
-    <div className="glass-card rounded-xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl p-4">
+    <div className="rounded-xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-sm font-semibold text-zinc-100">{String(finding.title)}</div>

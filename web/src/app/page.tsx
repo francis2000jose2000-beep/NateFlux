@@ -291,7 +291,7 @@ export default function Home() {
             <h3 className="mb-4 text-sm font-semibold text-zinc-400">Recent Successful Orchestrations</h3>
             <div className="grid gap-3">
               {successfulRuns.map((run) => (
-                <div key={run.pipelineId} className="glass-card flex items-center justify-between rounded-lg border border-white/10 bg-zinc-900/40 backdrop-blur-xl px-4 py-3 transition hover:bg-zinc-900/55">
+                <div key={run.pipelineId} className="flex items-center justify-between rounded-lg border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl px-4 py-3 transition hover:!bg-[#060010]/55">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm font-medium text-zinc-200">#{run.pipelineId}</span>
                     <span className="text-xs text-zinc-500">{run.repoUrl}</span>

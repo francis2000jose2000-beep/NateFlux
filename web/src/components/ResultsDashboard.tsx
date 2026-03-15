@@ -12,7 +12,7 @@ export function ResultsDashboard({ response, isLoading }: Props) {
 
   if (!response) {
     return (
-      <div className="glass-card rounded-2xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl p-6 text-sm text-zinc-300">
+      <div className="rounded-2xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-6 text-sm text-zinc-300">
         <div className="text-base font-semibold text-zinc-100">Results</div>
         <div className="mt-2 text-zinc-400">
           Paste a public GitHub repository URL and run a scan to see a compliance report.
@@ -40,7 +40,7 @@ export function ResultsDashboard({ response, isLoading }: Props) {
   const overall = report.summary.failed > 0 ? "FAIL" : "PASS";
 
   return (
-    <div className="glass-card rounded-2xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl p-6">
+    <div className="rounded-2xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="text-base font-semibold text-zinc-100">Compliance Report</div>
@@ -67,23 +67,23 @@ export function ResultsDashboard({ response, isLoading }: Props) {
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-4">
-        <div className="glass-card rounded-xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl p-4">
+        <div className="rounded-xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-4">
           <div className="text-xs text-zinc-400">Files scanned</div>
           <div className="mt-1 text-xl font-semibold text-zinc-100">
             {String(report.summary.filesScanned)}
           </div>
         </div>
-        <div className="glass-card rounded-xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl p-4">
+        <div className="rounded-xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-4">
           <div className="text-xs text-zinc-400">Passed</div>
           <div className="mt-1 text-xl font-semibold text-emerald-200">
             {String(report.summary.passed)}
           </div>
         </div>
-        <div className="glass-card rounded-xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl p-4">
+        <div className="rounded-xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-4">
           <div className="text-xs text-zinc-400">Failed</div>
           <div className="mt-1 text-xl font-semibold text-rose-200">{String(report.summary.failed)}</div>
         </div>
-        <div className="glass-card rounded-xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl p-4">
+        <div className="rounded-xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-4">
           <div className="text-xs text-zinc-400">Duration</div>
           <div className="mt-1 text-xl font-semibold text-zinc-100">
             {(report.durationMs / 1000).toFixed(1)}s
@@ -92,7 +92,7 @@ export function ResultsDashboard({ response, isLoading }: Props) {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4">
+        <div className="rounded-xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-4">
           <div className="text-sm font-semibold text-rose-100">Failing checks</div>
           <div className="mt-3 space-y-3">
             {failed.length === 0 ? (
@@ -103,7 +103,7 @@ export function ResultsDashboard({ response, isLoading }: Props) {
           </div>
         </div>
 
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+        <div className="rounded-xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-4">
           <div className="text-sm font-semibold text-emerald-100">Passing checks</div>
           <div className="mt-3 space-y-3">
             {passed.length === 0 ? (
@@ -116,7 +116,7 @@ export function ResultsDashboard({ response, isLoading }: Props) {
       </div>
 
       {skipped.length > 0 ? (
-        <div className="glass-card mt-6 rounded-xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl p-4">
+        <div className="mt-6 rounded-xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl p-4">
           <div className="text-sm font-semibold text-zinc-100">Skipped checks</div>
           <div className="mt-3 space-y-3">
             {skipped.map((f) => (
@@ -133,7 +133,7 @@ export function ResultsDashboard({ response, isLoading }: Props) {
         <button
           type="button"
           onClick={() => navigator.clipboard.writeText(JSON.stringify(report, null, 2))}
-          className="h-10 rounded-xl border border-white/10 bg-zinc-900/40 backdrop-blur-xl px-4 text-sm text-zinc-200 transition hover:bg-zinc-900/55"
+          className="h-10 rounded-xl border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl px-4 text-sm text-zinc-200 transition hover:!bg-[#060010]/55"
         >
           Copy report JSON
         </button>

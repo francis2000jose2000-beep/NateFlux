@@ -20,8 +20,8 @@ export function DebugConsole({ logs }: DebugConsoleProps) {
   if (recentLogs.length === 0) return null;
 
   return (
-    <div className="glass-card mt-10 w-full max-w-6xl mx-auto rounded-lg overflow-hidden border border-white/10 bg-zinc-900/40 backdrop-blur-xl">
-      <div className="flex items-center justify-between border-b border-white/10 bg-zinc-900/40 px-4 py-2">
+    <div className="mt-10 w-full max-w-6xl mx-auto rounded-lg overflow-hidden border border-white/10 !bg-[#060010]/40 backdrop-blur-2xl">
+      <div className="flex items-center justify-between border-b border-white/10 !bg-[#060010]/60 px-4 py-2">
         <h3 className="text-xs font-mono font-semibold text-zinc-400 uppercase tracking-wider">
           Debug Console
         </h3>
@@ -50,7 +50,7 @@ export function DebugConsole({ logs }: DebugConsoleProps) {
               )}
               {log.url && <span className="text-zinc-600 truncate max-w-md">{log.url}</span>}
             </div>
-            <pre className="bg-black/50 p-3 rounded text-[10px] text-zinc-300 overflow-x-auto font-mono custom-scrollbar">
+            <pre className="!bg-[#060010]/50 p-3 rounded text-[10px] text-zinc-300 overflow-x-auto font-mono custom-scrollbar">
               {JSON.stringify(log.data, null, 2)}
             </pre>
           </div>

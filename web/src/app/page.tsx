@@ -275,7 +275,7 @@ export default function Home() {
                   ok: true, 
                   status: 'running', 
                   id: Number(pipelineId), 
-                  web_url: `https://gitlab.com/demo/pipeline/${pipelineId}`,
+                  webUrl: `https://gitlab.com/demo/pipeline/${pipelineId}`,
                   checks: {
                       sentinel: 'running',
                       terraform: 'running'
@@ -290,7 +290,7 @@ export default function Home() {
                   ok: true, 
                   status: 'success', 
                   id: Number(pipelineId), 
-                  web_url: `https://gitlab.com/demo/pipeline/${pipelineId}`,
+                  webUrl: `https://gitlab.com/demo/pipeline/${pipelineId}`,
                   checks: {
                       sentinel: 'passed',
                       terraform: 'passed'

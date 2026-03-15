@@ -30,9 +30,10 @@ export type JobInfo = {
 export type PipelineStatusResponse =
   | {
       ok: true;
+      id: number; // Added for demo/mock tracking
       status: GitLabPipelineStatus;
       webUrl: string;
-      createdAt: string;
+      createdAt?: string; // Made optional for mock data
       finishedAt?: string;
       checks: { sentinel: CheckState; terraform: CheckState };
       jobs?: JobInfo[];

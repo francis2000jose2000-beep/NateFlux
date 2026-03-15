@@ -95,6 +95,7 @@ export async function GET(
 
     const payload: PipelineStatusResponse = {
       ok: true,
+      id: data.id,
       status: data.status, // GitLab statuses: 'created', 'pending', 'running', 'success', 'failed', 'canceled', etc.
       webUrl: data.web_url,
       createdAt: data.created_at,

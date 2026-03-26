@@ -9,10 +9,6 @@ type Props = {
   onScan: () => void;
 };
 
-function sanitizeRepoUrlInput(value: string) {
-  return value.replace(/[)\],.\s]+$/g, "");
-}
-
 export function ScanHero({
   repoUrl,
   setRepoUrl,
@@ -43,8 +39,9 @@ export function ScanHero({
           </label>
           <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <input
+              type="url"
               value={repoUrl}
-              onChange={(e) => setRepoUrl(sanitizeRepoUrlInput(e.target.value))}
+              onChange={(e) => setRepoUrl(e.target.value)}
               placeholder="Paste a public GitHub repository link (e.g., https://github.com/user/oci-infra)"
               className="h-12 w-full rounded-xl border border-white/10 bg-black/30 px-4 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none ring-0 transition focus:border-indigo-500/60 focus:bg-black/40"
               inputMode="url"

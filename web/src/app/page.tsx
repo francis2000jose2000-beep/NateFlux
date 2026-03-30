@@ -398,7 +398,6 @@ export default function Home() {
               Demo Mode
             </span>
           )}
-          <div className="text-xs text-zinc-400">DevSecOps Pipeline Orchestrator</div>
         </div>
       </header>
 
